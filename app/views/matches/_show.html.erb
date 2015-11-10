@@ -1,10 +1,11 @@
 
-<%# <%#ere's the general match information table . . . %>
+<%# <%# Here's the general match information table . . . %>
 <table>
   <tbody>
       <tr>
         <td><br>
 			<b><%= match.arena_name %></b> - <%= match.date_time %><br>
+			Match Duration: <%= match.match_duration.strftime("%M:%S") %><br>
 			<% if match.mmr_list.length > 1 %>
 			Approximate MMR:<% mmr_list = match.mmr_list
 				mmr_list[0] = '' %>
@@ -72,7 +73,7 @@
 				<td colspan ="8">
 					<ul><font size="1">
 					  <% if note != "" %>
-						<li><%= note %></li>
+						<li><b><%= note %></b></li>
 					  <% end %>
 					  <li><%= talents %></li>
 					  <li><%= glyphs %></li>

@@ -17,6 +17,7 @@ class ReportsController < ApplicationController
     talents = talent_string.split(",")
     glyphs = glyph_string.split(",")
     tally = record[:talent_tally]
+    gtally = record[:glyph_tally]
     
     logger.debug("Adding talents to records for b_won: " + b_won.to_s)
     talents.each do |talent|    
@@ -33,7 +34,23 @@ class ReportsController < ApplicationController
         tal_tally[:losses] += 1        
       end    
     end
-       
+        
+    
+    glyphs.each do |glyph|    
+      logger.debug("Adding or updating glyph: " + glyph)
+             
+      gly_tally = gtally[glyph] ||= { glyph: glyph, wins: 0, losses: 0}
+      
+      # Update the count and list of matches
+      if b_won                 
+        logger.debug ("Adding one to glyph win, which is now: " + (gly_tally[:wins] + 1).to_s)
+        gly_tally[:wins] += 1
+      else
+        logger.debug ("Adding one to glyph loss, which is now: " + (gly_tally[:losses] + 1).to_s)
+        gly_tally[:losses] += 1        
+      end    
+    end
+    
   end
   
   def qualifying_matches
@@ -187,23 +204,26 @@ class ReportsController < ApplicationController
                 opposing_spec = Player.find_by(id: single_match_score.player_id).class_name + "-" + Player.find_by(id: single_match_score.player_id).spec_name
                 logger.debug "Spec name generated: " + opposing_spec
 
+                #########################################################
                 #### Single spec building:
+                #########################################################
                 if !specs_seen.include?(opposing_spec)
                   logger.debug "Specs seen: " + specs_seen.to_s
                   logger.debug "Did not see opposting spec, adding it."
                   # look up or create the record for this spec
-                  rec = @records_by_spec[opposing_spec] ||= { spec: opposing_spec, wins: 0, losses: 0, won_matches: [], lost_matches: [], won_talents: [], won_glyphs: [], lost_talents: [], lost_glyphs: [], talent_tally: {}}
+                  rec = @records_by_spec[opposing_spec] ||= { spec: opposing_spec, wins: 0, losses: 0, won_matches: [], lost_matches: [], won_talents: [], won_glyphs: [], lost_talents: [], lost_glyphs: [], talent_tally: {}, glyph_tally: {}, win_notes: [],  loss_notes: []}
                   pmi = PersonalMatchInfo.find_by(match_id: my_score.match_id, player_id: @player.id)                   
                   # Update the count and list of matches
                   if b_won                    
                     rec[:wins] += 1
-                    rec[:won_matches] << [my_score.match_id]  
+                    rec[:won_matches] << [my_score.match_id]                      
                     if pmi
                       logger.debug("Logging won talents and glyphs")
                       logger.debug(pmi.talents)
                       logger.debug(pmi.glyphs)
                       rec[:won_talents] << pmi.talents 
                       rec[:won_glyphs] << pmi.glyphs  
+                      rec[:win_notes] << pmi.note.split(/\^\^\^\^/).first
                       tally_talents(rec, b_won, pmi.talents, pmi.glyphs)
                     end # end if there is personal match info for a player.		
                   else
@@ -215,6 +235,7 @@ class ReportsController < ApplicationController
                       logger.debug(pmi.glyphs)
                       rec[:lost_talents] << pmi.talents 
                       rec[:lost_glyphs] << pmi.glyphs 
+                      rec[:loss_notes] << pmi.note.split(/\^\^\^\^/).first
                       tally_talents(rec, b_won, pmi.talents, pmi.glyphs)
                     end # end if there is personal match info for a player.		
                   end
@@ -226,9 +247,7 @@ class ReportsController < ApplicationController
                 specs_seen.push(opposing_spec)
                 logger.debug "built specs: " + specs_seen.to_s
               end # if the score is not one of our team
-
-            end # end - for all scores belonging to a single match id
-            
+            end # end - for all scores belonging to a single match id            
           end # end - for each score in our match.
           
           
@@ -236,7 +255,7 @@ class ReportsController < ApplicationController
           
           # Build the double spec array here
           opposing_team = specs_seen.sort.to_s
-          rec = @records_by_team[opposing_team] ||= { team: opposing_team, wins: 0, losses: 0, won_matches: [], lost_matches: [], won_talents: [], won_glyphs: [], lost_talents: [], lost_glyphs: [], talent_tally: {} }
+          rec = @records_by_team[opposing_team] ||= { team: opposing_team, wins: 0, losses: 0, won_matches: [], lost_matches: [], won_talents: [], won_glyphs: [], lost_talents: [], lost_glyphs: [], talent_tally: {} , glyph_tally: {}, win_notes: [],  loss_notes: []}
           # update the appropriate field
           #rec[  b_won ? :wins : :losses ] += 1
          # Update the count and list of matches

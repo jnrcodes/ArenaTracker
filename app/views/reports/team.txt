@@ -1,0 +1,66 @@
+<table class="general">
+  <thead>
+    <tr>
+      <th>Team</th>
+      <th>Wins</th>
+	  <th>Win %</th>
+	  <th>Losses</th>      
+	  <th>Loss %</th>
+	  <th>Total fights</th>
+	  <th>Won</th>
+	  <th>Lost</th>
+	  <th>Tally</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @records_by_team.each do |spec_rec| %>
+      <tr class="spec">
+		<td><span class="toggle">▶</span>
+		    <b><%= spec_rec[1][:team] %></b></td>		
+		<td align="right"><%= spec_rec[1][:wins] %></td>		
+		<td align="right"><%= spec_rec[1][:winpct] %>%</td>
+		<td align="right"><%= spec_rec[1][:losses] %></td>					
+		<td align="right"><%= spec_rec[1][:losspct] %>%</td>
+		<td align="right"><%= spec_rec[1][:total] %></td>
+		<td align="left"><%= spec_rec[1][:won_matches].join(',') %></td> 
+		<td align="left"><%= spec_rec[1][:lost_matches].join(',') %></td> 
+		<td><%= spec_rec[1][:talent_tally] %></td>
+      </tr>
+
+	  <% # Now show the talents and talent percentages, under the spec %>	  	  
+      <tr class="talent"><td>&nbsp;</td><td colspan="7">Talent Detail</td></tr>
+	  <tr class="talent">
+		<td></td>
+		<td colspan ="7">		  
+		  <table class="sub" width="80%">
+			  <thead>
+				<tr>
+				  <th>Talent</th>				  
+				  <th>Win %</th>
+				  <th>Loss %</th>	  				  				 
+				</tr>
+			  </thead>
+			  <tbody>				
+				<% spec_rec[1][:talent_tally].each do |talent_hash| %>
+				  <tr>				   
+					<td><%= talent_hash[1][:talent] %></td>		
+					<% if talent_hash[1][:wins] > 0 %>
+						<td align="right"><%= ((talent_hash[1][:wins])/spec_rec[1][:wins] * 100) %>%</td>		
+					<% else %>
+					   <td align="right">-</td>		
+					<% end %>
+					<% if talent_hash[1][:losses] > 0 %>
+						<td align="right"><%= ((talent_hash[1][:losses])/spec_rec[1][:losses] * 100) %>%</td>				
+					<% else %>
+					   <td align="right">-</td>		
+					<% end %>
+				  </tr>
+				<% end %>
+			  </tbody>
+			</table>
+			</td>
+	    </tr>
+	   </tbody>
+    <% end %>
+  </tbody>
+</table>
