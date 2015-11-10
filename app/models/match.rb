@@ -22,7 +22,7 @@ class Match < ActiveRecord::Base
     available_filters: [
       :sorted_by,
       :with_player,
-      :mmr_above
+      :mmr_above,
       :with_id
     ]
   )
