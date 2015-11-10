@@ -44,4 +44,8 @@ class Match < ActiveRecord::Base
     select { |match| match.mmr_avg > mmr } 
   }
   
+  scope :mmr_below, lambda { |mmr|
+    select { |match| match.mmr_avg < mmr } 
+  }
+  
 end
