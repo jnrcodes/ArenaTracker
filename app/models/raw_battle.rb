@@ -470,6 +470,7 @@ class RawBattle < ActiveRecord::Base
     matches = self.raw_battle_data.match re
     if matches.nil?
       logger.debug("Joined time not found")
+      match_times[:joined_time] = Time.at(0)      
     else      
       match_times[:joined_time] = matches[1].to_datetime      
     end
@@ -477,6 +478,7 @@ class RawBattle < ActiveRecord::Base
     re = /.*LEFT:([^,]*)/
     matches = self.raw_battle_data.match re
     if matches.nil?
+      match_times[:left_time] = Time.at(0)      
       logger.debug("Left time not found")
     else
       match_times[:left_time] = matches[1].to_datetime

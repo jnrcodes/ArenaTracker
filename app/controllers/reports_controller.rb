@@ -270,6 +270,7 @@ class ReportsController < ApplicationController
               logger.debug(pmi.glyphs)
               rec[:won_talents] << pmi.talents 
               rec[:won_glyphs] << pmi.glyphs  
+              rec[:win_notes] << pmi.note.split(/\^\^\^\^/).first
               tally_talents(rec, b_won, pmi.talents, pmi.glyphs)
             end # end if there is personal match info for a player.		
           else
@@ -281,6 +282,7 @@ class ReportsController < ApplicationController
               logger.debug(pmi.glyphs)
               rec[:lost_talents] << pmi.talents 
               rec[:lost_glyphs] << pmi.glyphs 
+              rec[:loss_notes] << pmi.note.split(/\^\^\^\^/).first
               tally_talents(rec, b_won, pmi.talents, pmi.glyphs)
             end # end if there is personal match info for a player.		
           end

@@ -33,8 +33,7 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 	  <th>Loss %</th>	  
 	  <th>Total fights</th>
 	  <th>Won fights</th>
-	  <th>Lost fights</th>
-	  <th>Tal tal</th>
+	  <th>Lost fights</th>	  
 	 <!-- <th>Match IDs</th> -->
     </tr>
   </thead>
@@ -63,21 +62,17 @@ Tally of wins/losses for all matches containing at least one of a particular spe
         <%= link_to "Lost #{lost.length} matches", "/matches#{query}" %>
         </td>
 
-	    <td><%= spec_rec[1][:talent_tally] %></td>
-		<% if false %>
-		<td align="left"><%= spec_rec[1][:lost_matches].join(',') %></td>  
-		<% end %>
       </tr>
 	  
 	  <% # And now show the won notes . . . %>
-	   <tr class="talent"><td>&nbsp;</td><th colspan="7">Winning Match Notes</th></tr>
+	   
 	   <tr class="talent">
 		<td></td>
 		<td colspan ="7">
 		  <table width=80% class="sub">
 			  <thead>
 				<tr>
-				  <th>Note</th>				  				  
+				  <th>Winning Notes</th>				  				  
 				</tr>
 			  </thead>
 			  <tbody>
@@ -92,15 +87,14 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 	    </tr>
 	  
 	  
-	  <% # And now show the loss notes . . . %>
-	   <tr class="talent"><td>&nbsp;</td><th colspan="7">Losing Match Notes</th></tr>
+	  <% # And now show the loss notes . . . %>	   
 	   <tr class="talent">
 		<td></td>
 		<td colspan ="7">
 		  <table width=80% class="sub">
 			  <thead>
 				<tr>
-				  <th>Note</th>				  				  
+				  <th>Losing Notes</th>				  				  
 				</tr>
 			  </thead>
 			  <tbody>
@@ -115,15 +109,14 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 	    </tr>	  
 	  
 	  
-	  <% # Now show the talents and talent percentages, under the spec %>	  
-       <tr class="talent"><td>&nbsp;</td><th colspan="7">Talent Detail </th></tr>
+	  <% # Now show the talents and talent percentages, under the spec %>	         
 	   <tr class="talent">
 		<td></td>
 		<td colspan ="7">
 		  <table width=80% class="sub">
 			  <thead>
 				<tr>
-				  <th>Talent</th>				  
+				  <th>Talents</th>				  
 				  <th>Win %</th>
 				  <th>Loss %</th>	  				  				 
 				</tr>
@@ -148,15 +141,14 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 			</table>
 			</td>
 	    </tr>
-		
-	   <tr class="talent"><td>&nbsp;</td><th colspan="7">Glyph Detail </th></tr>
+			   
 	   <tr class="talent">
 		<td></td>
 		<td colspan ="7">
 		  <table width=80% class="sub">
 			  <thead>
 				<tr>
-				  <th>Glyph</th>				  
+				  <th>Glyphs</th>				  
 				  <th>Win %</th>
 				  <th>Loss %</th>	  				  				 
 				</tr>
@@ -190,7 +182,7 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 </table>
 
 <h2>vs. Teams</h2>
-<table class="general">
+<table class="general" id="report">
   <thead>
     <tr>
       <th>Team</th>
@@ -200,49 +192,103 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 	  <th>Loss %</th>
 	  <th>Total fights</th>
 	  <th>Won</th>
-	  <th>Lost</th>
-	  <th>Tally</th>
+	  <th>Lost</th>	  
     </tr>
   </thead>
   <tbody>
     <% @records_by_team.each do |spec_rec| %>
       <tr class="spec">
-		<td><span class="toggle">▶</span>
+		<td class="toggle">▶
 		    <b><%= spec_rec[1][:team] %></b></td>		
 		<td align="right"><%= spec_rec[1][:wins] %></td>		
 		<td align="right"><%= spec_rec[1][:winpct] %>%</td>
 		<td align="right"><%= spec_rec[1][:losses] %></td>					
 		<td align="right"><%= spec_rec[1][:losspct] %>%</td>
 		<td align="right"><%= spec_rec[1][:total] %></td>
-		<td align="left"><%= spec_rec[1][:won_matches].join(',') %></td> 
-		<td align="left"><%= spec_rec[1][:lost_matches].join(',') %></td> 
-		<td><%= spec_rec[1][:talent_tally] %></td>
-      </tr>
+		<td align="left"><%
+        won = spec_rec[1][:won_matches].flatten
+        query = '?' + won.map { |id| "filterrific[with_id][]=#{id}" }.join('&')
+        %>
+        <%= link_to "Won #{won.length} matches", "/matches#{query}" %>		
+        </td>
+		
 
-	  <% # Now show the talents and talent percentages, under the spec %>	  	  
-      <tr class="talent"><td>&nbsp;</td><td colspan="7">Talent Detail</td></tr>
-	  <tr class="talent">
+		<td align="left"><%
+        lost = spec_rec[1][:lost_matches].flatten
+        query = '?' + lost.map { |id| "filterrific[with_id][]=#{id}" }.join('&')
+        %>
+        <%= link_to "Lost #{lost.length} matches", "/matches#{query}" %>
+        </td>	
+      </tr>
+	  
+	   
+	   	  <% # And now show the won notes . . . %>	   
+	   <tr class="talent">
 		<td></td>
-		<td colspan ="7">		  
-		  <table class="sub" width="80%">
+		<td colspan ="7">
+		  <table width=80% class="sub">
 			  <thead>
 				<tr>
-				  <th>Talent</th>				  
+				  <th>Winning Notes</th>				  				  
+				</tr>
+			  </thead>
+			  <tbody>
+				<% spec_rec[1][:win_notes].each do |note| %>
+				  <tr>				   
+					<td><%= note %></td>												
+				  </tr>
+				<% end %>
+			  </tbody>
+			</table>
+			</td>
+	    </tr>
+	  
+	  
+	  <% # And now show the loss notes . . . %>	   
+	   <tr class="talent">
+		<td></td>
+		<td colspan ="7">
+		  <table width=80% class="sub">
+			  <thead>
+				<tr>
+				  <th>Losing Notes</th>				  				  
+				</tr>
+			  </thead>
+			  <tbody>
+				<% spec_rec[1][:loss_notes].each do |note| %>
+				  <tr>				   
+					<td><%= note %></td>												
+				  </tr>
+				<% end %>
+			  </tbody>
+			</table>
+			</td>
+	    </tr>	  
+	  
+	  
+	  <% # Now show the talents and talent percentages, under the spec %>	         
+	   <tr class="talent">
+		<td></td>
+		<td colspan ="7">
+		  <table width=80% class="sub">
+			  <thead>
+				<tr>
+				  <th>Talents</th>				  
 				  <th>Win %</th>
 				  <th>Loss %</th>	  				  				 
 				</tr>
 			  </thead>
-			  <tbody>				
+			  <tbody>
 				<% spec_rec[1][:talent_tally].each do |talent_hash| %>
 				  <tr>				   
-					<td><%= talent_hash[1][:talent] %></td>		
+					<td><%= talent_hash[1][:talent] %></td>							
 					<% if talent_hash[1][:wins] > 0 %>
-						<td align="right"><%= ((talent_hash[1][:wins])/spec_rec[1][:wins] * 100) %>%</td>		
+						<td align="right"><%= ((talent_hash[1][:wins]).to_f/spec_rec[1][:wins].to_f * 100) %>%</td>		
 					<% else %>
 					   <td align="right">-</td>		
 					<% end %>
 					<% if talent_hash[1][:losses] > 0 %>
-						<td align="right"><%= ((talent_hash[1][:losses])/spec_rec[1][:losses] * 100) %>%</td>				
+						<td align="right"><%= ((talent_hash[1][:losses].to_f)/spec_rec[1][:losses].to_f * 100) %>%</td>				
 					<% else %>
 					   <td align="right">-</td>		
 					<% end %>
@@ -252,7 +298,42 @@ Tally of wins/losses for all matches containing at least one of a particular spe
 			</table>
 			</td>
 	    </tr>
-	   </tbody>
+			   
+	   <tr class="talent">
+		<td></td>
+		<td colspan ="7">
+		  <table width=80% class="sub">
+			  <thead>
+				<tr>
+				  <th>Glyphs</th>				  
+				  <th>Win %</th>
+				  <th>Loss %</th>	  				  				 
+				</tr>
+			  </thead>
+			  <tbody>
+				<% spec_rec[1][:glyph_tally].each do |glyph_hash| %>
+				  <tr>				   
+					<td><%= glyph_hash[1][:glyph] %></td>							
+					<% if glyph_hash[1][:wins] > 0 %>
+						<td align="right"><%= ((glyph_hash[1][:wins]).to_f/spec_rec[1][:wins].to_f * 100) %>%</td>		
+					<% else %>
+					   <td align="right">-</td>		
+					<% end %>
+					<% if glyph_hash[1][:losses] > 0 %>
+						<td align="right"><%= ((glyph_hash[1][:losses].to_f)/spec_rec[1][:losses].to_f * 100) %>%</td>				
+					<% else %>
+					   <td align="right">-</td>		
+					<% end %>
+				  </tr>
+				<% end %>
+			  </tbody>
+			</table>
+			</td>
+	    </tr>
+	   
+	   
+	   
+	   
     <% end %>
   </tbody>
 </table>
