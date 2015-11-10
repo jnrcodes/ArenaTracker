@@ -1,27 +1,32 @@
 class Match < ActiveRecord::Base
   has_many :scores
-  has_many :personal_match_infos  
+  has_many :personal_match_infos
   has_many :players, through: :scores
   has_many :match_talent_glyph_selections
-  
+
   # any methods def'ed here become instance methods on Match objects
   def mmrs
      mmr_list.nil? ? [] : mmr_list.split(/,/).map(&:to_i)
   end
-  
+
   def mmr_avg
      mmrs.instance_eval { empty? ? 0 : reduce(0,:+) / size.to_f.round }
   end
-  
+
+  def length
+    match_end - match_start
+  end
+
   filterrific(
     default_filter_params: { sorted_by: 'date_time_desc' },
     available_filters: [
       :sorted_by,
       :with_player,
       :mmr_above
+      :with_id
     ]
   )
-  
+
   scope :sorted_by, lambda { |sort_key|
     direction = sort_key =~ /desc$/ ? 'desc' : 'asc'
     case sort_key.to_s
@@ -32,14 +37,15 @@ class Match < ActiveRecord::Base
     else
       # raise ArgumentError, "Invalid sort option: #{ sort_option.inspect }"
       raise ArgumentError, "Invalid sort option: #{ sort_key.to_s }"
-      
+
     end
   }
-  
+
   scope :with_player, lambda { |players|
     where player: [*players]
   }
-  
+
+
   scope :mmr_above, lambda { |mmr|
     select { |match| match.mmr_avg > mmr } 
   }
@@ -48,4 +54,13 @@ class Match < ActiveRecord::Base
     select { |match| match.mmr_avg < mmr } 
   }
   
+
+  scope :with_id, lambda { |matches|
+    where id: [*matches]
+  }
+
+  def self.options_for_select
+    order('id').map { |e| [e.id, e.id] }
+  end
+
 end

@@ -1,8 +1,15 @@
 class Player < ActiveRecord::Base
+  PVP_URL_PREFIX = 'http://eu.battle.net/wow/en/character/'
+
   has_many :scores
   has_many :personal_match_infos
   has_many :matches, through: :scores
   has_many :match_talent_glyph_selections
+  belongs_to :server
+
+  def server_name
+    has_attribute?(:server_name) ? self[:server_name] : server.name
+  end
 
   filterrific(
     default_filter_params: { sorted_by: 'name_asc' },
@@ -49,6 +56,10 @@ class Player < ActiveRecord::Base
         }
     }.uniq.map(&:id)
   }
+
+  def pvp_url
+    File.join PVP_URL_PREFIX, server.translated_name, name, 'pvp#bgs'
+  end
 
   def self.options_for_select
     order('LOWER(name)').map { |e| [e.name, e.id] }
