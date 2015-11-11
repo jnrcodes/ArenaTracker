@@ -9,7 +9,7 @@ class Match < ActiveRecord::Base
      mmr_list.nil? ? [] : mmr_list.split(/,/).map(&:to_i)
   end
 
-  def mmr_avg
+  def mmr_avg     
      mmrs.instance_eval { empty? ? 0 : reduce(0,:+) / size.to_f.round }
   end
 

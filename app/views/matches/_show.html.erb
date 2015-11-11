@@ -6,10 +6,8 @@
         <td><br>
 			<b><%= match.arena_name %></b> - <%= match.date_time %><br>
 			Match Duration: <%= match.match_duration.strftime("%M:%S") %><br>
-			<% if match.mmr_list.length > 1 %>
-			Approximate MMR:<% mmr_list = match.mmr_list
-				mmr_list[0] = '' %>
-			<%= mmr_list.split(",").map(&:to_i).instance_eval { reduce(:+) / size.to_f.round } %>
+		<% if match.mmr_list.length > 1 %>
+			Approximate MMR: <%= match.mmr_avg %>
 		<% else %>
 			Skirmish
 		<% end %> </td>

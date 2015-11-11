@@ -76,6 +76,17 @@ class ReportsController < ApplicationController
       logger.debug "Looking for matches min '#{min_rating}'"
       logger.debug "Looking for matches max '#{max_rating}'"
       
+      if min_rating > 0       
+        matches = matches.select do |m|
+          logger.debug "Looking for matches min '#{m.mmr_avg}'"
+          m.mmr_avg > min_rating
+        end
+      end
+      
+      if max_rating < 4000
+        matches = matches.select { |m| m.mmr_avg < max_rating }
+      end
+=begin      
       if min_rating > 1 and max_rating < 4000
         matches.each do |match|
         
@@ -95,8 +106,8 @@ class ReportsController < ApplicationController
       else
         qualifying_matches = matches
       end # for each match, check match-related things
-      
-      return qualifying_matches
+=end      
+      return matches
   end
   
   def vsspec

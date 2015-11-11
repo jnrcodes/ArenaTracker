@@ -67,7 +67,9 @@ class RawBattle < ActiveRecord::Base
         m.match_end = time_hash[:left_time]
         m.match_duration = time_hash[:length]
         m.death_times = time_hash[:death_times]
-        logger.debug("times: " + m.match_start.to_s + " " + m.match_end.to_s + " " + m.death_times)
+        logger.debug("times: " + m.match_start.to_s)
+        logger.debug("times: " + m.match_end.to_s )
+        logger.debug("times: " + m.death_times)
       end
 
       match = Match.find_by reference: reference
@@ -203,8 +205,9 @@ class RawBattle < ActiveRecord::Base
           logger.debug("WTF???")
         end
 
-        if match.mmr_list.nil?
+        if match.mmr_list.nil? || match.mmr_list == ""
           logger.debug("cell is blank")
+          
         # !match.mmr_list.nil? and !match.mmr_list.empty?
           Match.update(match.id, :mmr_list => new_mmrs)
         else
@@ -263,6 +266,7 @@ class RawBattle < ActiveRecord::Base
       matches = self.raw_battle_data.match re
       if matches.nil?
         logger.debug("Notes not found")
+        pmi.note = "^^^^"        
       else
         logger.debug("got note: " + matches[1])
         pmi.note = matches[1]
@@ -465,6 +469,7 @@ class RawBattle < ActiveRecord::Base
     logger.debug("Getting times from match - start/end/died")
     
     match_times = { }
+    match_times[:death_times] = "not found"  
     
     re = /.*JOINED:([^,]*)/
     matches = self.raw_battle_data.match re
@@ -489,6 +494,7 @@ class RawBattle < ActiveRecord::Base
     matches = self.raw_battle_data.scan re
     if matches.nil?
       logger.debug("Death time not found")
+      match_times[:death_times] = "not found"      
     else
       logger.debug ("death time array:")
       logger.debug (matches.to_s)
@@ -527,6 +533,8 @@ class RawBattle < ActiveRecord::Base
         match_times[:death_times] = death_string
       end # for each death time
     end # if there are death times
+    
+      
     
     match_times[:length] = Time.at((match_times[:left_time] - match_times[:joined_time])  * 1.days)
     logger.debug("total match length: " + match_times[:length].to_s)
