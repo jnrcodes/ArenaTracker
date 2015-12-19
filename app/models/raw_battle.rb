@@ -378,6 +378,9 @@ class RawBattle < ActiveRecord::Base
     else
       server_name = matches[1]
     end
+    
+    # In case the server name has notes appended, deal with that . . .  
+    server_name.sub!("NOTE.*$", "")
 
     return server_name
   end

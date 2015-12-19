@@ -135,6 +135,8 @@ class ReportsController < ApplicationController
     @player = Player.find @params[:player_id]
     
     matches = qualifying_matches()
+    logger.debug "qualifying matches found: " + matches.length.to_s
+    
 =begin    
     # get other player info:
     if params[:player_id2].to_i > 0
@@ -150,6 +152,10 @@ class ReportsController < ApplicationController
       matches = @player.matches
     end
 =end
+        
+    logger.debug "count of scores: " + @player.scores.size.to_s
+    
+            
         
     # Get all the scores for that player
     @player.scores.select { |s| matches.include?(s.match) }.each do |my_score|
